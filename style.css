@@ -1,0 +1,29 @@
+@font-face
+{
+	font-family: "pixel";
+	src: url("fonts/OldGameFatty.ttf");
+}
+
+body
+{
+	font-family: "pixel";
+	color: white;
+	background-color: black;
+}
+
+h1
+{
+	text-align: center;
+}
+
+canvas
+{
+	margin: auto;
+	padding: 0;
+	display: block;
+	border: solid 2px white;
+	border-radius: 10px;
+
+	image-rendering: pixelated;
+}
+
