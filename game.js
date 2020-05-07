@@ -1,8 +1,10 @@
 var map = [];
+var overmap = [];
 var clipMap = [];
 var graph;
 var tileset;
 var characters_tileset;
+var objects_tileset;
 var characters = [];
 var realTileSize;
 var frame_n = 0;
@@ -55,8 +57,10 @@ function startup()
 
 	tileset = new Tileset("res/grass-tiles.png", 16, 16);
 	characters_tileset = new Tileset("res/characters.png", 16, 18);
+	objects_tileset = new Tileset("res/plants.png", 16, 16);
 
 	characters.push(new Character());
+	player = characters[0];
 
 	// spawn zombies
 	for (var i = 0; i < 10; ++i) {
@@ -69,6 +73,7 @@ function startup()
 		
 	map = Array.from(Array(100), () => new Array(100));
 	clipMap = Array.from(Array(100), () => new Array(100));
+	overmap = Array.from(Array(100), () => new Array(100));
 	realTileSize = 64;
 	// generate map
 	for (var i=0; i < 100; ++i) {
@@ -78,7 +83,14 @@ function startup()
 			} else {
 				map[i][j] = 0;
 			}
-			clipMap[i][j] = 1;
+
+			if (Math.random() < .1 && ! (i == player.px && j == player.py)) {
+				overmap[i][j] = 1;
+				clipMap[i][j] = 0;
+			} else {
+				overmap[i][j] = 0;
+				clipMap[i][j] = 1;
+			}
 		}
 	}
 	graph = new Graph(clipMap);
@@ -171,7 +183,7 @@ function draw_game()
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 
-	// draw grid
+	// draw terrain
 	for (var i=0; i < map.length; ++i) {
 		for (var j=0; j < map[i].length; ++j) {
 			var tileN = 7;
@@ -182,11 +194,21 @@ function draw_game()
 					tileN = 0;
 					break;
 			}
-			if (graph.grid[i][j].weight == 0) {
-				ctx.fillStyle = "red";
-				ctx.fillRect(camera_x + i * realTileSize, camera_y + j * realTileSize, realTileSize, realTileSize);
-			}
 			tileset.drawTile(tileN, ctx, camera_x + i * realTileSize, camera_y + j * realTileSize);
+		}
+	}
+
+	// draw overlay objects
+	for (var i=0; i < map.length; ++i) {
+		for (var j=0; j < map[i].length; ++j) {
+			switch (overmap[i][j]) {
+				case 0:
+					break;
+				case 1:
+					var tileN = 0;
+					objects_tileset.drawTile(tileN, ctx, camera_x + i * realTileSize, camera_y + j * realTileSize);
+					break;
+			}
 		}
 	}
 
